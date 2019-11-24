@@ -1,0 +1,12 @@
+default: # default connection
+  type: "postgres"
+  host: "localhost"
+  port: 5432
+  username: "postgres"
+  password: "postgres"
+  database: "postgres"
+  synchronize: true
+  logging: false
+  entities: ["src/entity/**/*.ts"] # change to dist/src/entity/**/*.js when running npm run start
+  migrations: ["src/migration/**/*.ts"] # change to dist/src/migration/**/*.js when running npm run start
+  subscribers: ["src/subscriber/**/*.ts"] # change to dist/src/subscriber/**/*.js when running npm run start

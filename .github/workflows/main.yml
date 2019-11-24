@@ -1,0 +1,52 @@
+name: CI
+on: [push]
+jobs:
+  build:
+    name: Publish App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install deps
+        uses: borales/actions-yarn@v2.0.0
+        with:
+          cmd: install
+      - name: Test lint
+        uses: borales/actions-yarn@v2.0.0
+        with:
+          cmd: format:lint
+      - name: Test format
+        uses: borales/actions-yarn@v2.0.0
+        with:
+          cmd: format:prettier
+      - name: Sign into Docker registry
+        run: |
+          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $DOCKER_REGISTRY_URL
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PW }}
+          DOCKER_REGISTRY_URL: docker.pkg.github.com
+      - name: Remove old Docker image
+        run: |
+          docker images -a
+          docker rmi --force 'latest'
+      - name: Build Docker image
+        run: |
+          docker images -a
+          docker build -t docker.pkg.github.com/sumitmckv/node-starter/starter-image:latest -f ./Dockerfile .
+      - name: Push Docker image
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PW }}
+          DOCKER_REGISTRY_URL: docker.pkg.github.com
+        run: |
+          docker push docker.pkg.github.com/sumitmckv/node-starter/starter-image:latest
+      - name: Heroku Release
+        run: |
+          docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
+          docker tag docker.pkg.github.com/sumitmckv/node-starter/starter-image:latest registry.heroku.com/typescript-node-starter/web
+          docker push registry.heroku.com/typescript-node-starter/web
+          heroku container:release web -a typescript-node-starter
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
