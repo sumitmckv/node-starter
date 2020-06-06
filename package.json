@@ -58,7 +58,7 @@
     "@hapi/inert": "^5.2.2",
     "@hapi/joi": "15.1.1",
     "@hapi/vision": "^5.5.4",
-    "apollo-server-core": "^2.9.12",
+    "apollo-server-core": "^2.14.2",
     "dotenv": "^8.2.0",
     "graphql": "^14.5.8",
     "hapi-auth-jwt2": "^8.8.0",
